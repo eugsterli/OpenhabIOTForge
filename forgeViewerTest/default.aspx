@@ -62,8 +62,8 @@
         </div>
     </form>
 
-     <button id="MyLockButton" style="z-index:10">Lock it!</button>
-    <button id="MyUnlockButton" style="z-index:10">Unlock it!</button>
+     <button id="MyLockButton" onclick='viewer.loadExtension('SmokeDetectorsExtension');' style="z-index:10">Lock it!</button>
+    <button id="MyUnlockButton" onclick='viewer.addEventListener(Autodesk.Viewing.OBJECT_TREE_CREATED_EVENT);' style="z-index:10">Unlock it!</button>
     <div id="MyViewerDiv"></div>
    
 

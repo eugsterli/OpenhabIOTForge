@@ -13,20 +13,35 @@ using Microsoft.ServiceBus.Messaging;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
+using System.Data;
+using System.Configuration;
+using MySql.Data.MySqlClient;
+using System.Web.Script.Serialization;
 
 namespace forgeViewerTest
 {
     public partial class _default : System.Web.UI.Page
     {
   
-        [ThreadStatic]
-        public static string sensorvalue;
+        
+        public static string[] sensorvalue = new string[7];
 
-
+        
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            sensorvalue = "bullshit";
+
+
+            ThreadStart childthreat = new ThreadStart(GetMySQLData);
+            ThreadStart childthreat2 = new ThreadStart(RefreshJavascriptArray);
+
+            Thread child = new Thread(childthreat);
+            Thread child2 = new Thread(childthreat2);
+
+            child.Start();
+            child2.Start();
+
+
 
 
 
@@ -36,16 +51,9 @@ namespace forgeViewerTest
 
         protected async void Button1_Click(object sender, EventArgs e)
         {
-    
-   
+            
 
-
-            ///give sensordate to javascript variable numbers
-            string sample;
-            sample = sensorvalue;
-            ScriptManager.RegisterClientScriptBlock(this, e.GetType(), "settingvariable", "var numbers='" + sample + "'", true);
-
-
+          
             // create a randomg bucket name (fixed prefix + randomg guid)
             string bucketKey = "forgeapp" + Guid.NewGuid().ToString("N").ToLower();
 
@@ -132,6 +140,57 @@ namespace forgeViewerTest
             return System.Convert.ToBase64String(plainTextBytes);
         }
 
-        
+        public static void GetMySQLData()
+        {
+            while (true)
+            {
+                
+
+                MySqlConnection connection = new MySqlConnection("Database=openhab;Data Source=localhost;User Id=root;Password=Sandro*93");
+                connection.Open();
+
+                MySqlCommand command = connection.CreateCommand();
+                command.CommandText = "select distinct i11.value, i12.value, i13.value, i14.value,i11.value,i11.value,i11.value from item11 as i11, item12 as i12, item13 as i13, item14 as i14 where i11.time = (select max(time) from item11) and i12.time = (select max(time) from item12) and i13.time = (select max(time) from item13) and i14.time = (select max(time) from item14)";
+                MySqlDataReader reader = command.ExecuteReader();
+
+                Object[] values = new Object[reader.FieldCount];
+
+                reader.Read();
+                int fieldCount = reader.GetValues(values);
+
+
+                for (int i = 0; i < fieldCount; i++)
+                {
+                    sensorvalue[i] = values[i].ToString();
+                }
+
+                connection.Close();
+                Thread.Sleep(10000);
+
+            }
+        }
+
+        public void RefreshJavascriptArray()
+        {
+            
+            while (true)
+            {
+
+                ///give sensordate to javascript variable numbers
+                //ScriptManager.RegisterClientScriptBlock(this, e.GetType(), "settingvariable", "var numbers='" + sensorvalue + "'", true);
+                var serializer = new JavaScriptSerializer();
+                var jsArray = string.Format("var jsArray = {0}", serializer.Serialize(sensorvalue));
+
+                ClientScriptManager cs = Page.ClientScript;
+                cs.RegisterClientScriptBlock(
+                    this.GetType(),
+                    "arrayDeclaration",
+                    jsArray,
+                    true
+                );
+
+                Thread.Sleep(9000);
+            }
+        }
     }
 }
