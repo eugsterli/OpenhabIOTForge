@@ -9,18 +9,43 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Microsoft.ServiceBus.Messaging;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Text;
 
 namespace forgeViewerTest
 {
     public partial class _default : System.Web.UI.Page
     {
+  
+        [ThreadStatic]
+        public static string sensorvalue;
+
+
+
         protected void Page_Load(object sender, EventArgs e)
         {
-           
+            sensorvalue = "bullshit";
+
+
+
+
         }
+      
 
         protected async void Button1_Click(object sender, EventArgs e)
         {
+    
+   
+
+
+            ///give sensordate to javascript variable numbers
+            string sample;
+            sample = sensorvalue;
+            ScriptManager.RegisterClientScriptBlock(this, e.GetType(), "settingvariable", "var numbers='" + sample + "'", true);
+
+
             // create a randomg bucket name (fixed prefix + randomg guid)
             string bucketKey = "forgeapp" + Guid.NewGuid().ToString("N").ToLower();
 
@@ -32,8 +57,8 @@ namespace forgeViewerTest
             // get a write enabled token
             TwoLeggedApi oauthApi = new TwoLeggedApi();
             dynamic bearer = await oauthApi.AuthenticateAsync(
-                WebConfigurationManager.AppSettings["FORGE_CLIENT_ID"],
-                WebConfigurationManager.AppSettings["FORGE_CLIENT_SECRET"],
+                "fuWM1Dm2PtbSTvtnjUg0WmXgDB88WsEt",
+                "vRR3VnJln5j1HDfT",
                 "client_credentials",
                 new Scope[] { Scope.BucketCreate, Scope.DataCreate, Scope.DataWrite, Scope.DataRead });
 

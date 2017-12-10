@@ -1,6 +1,8 @@
 ﻿Autodesk.Viewing.theExtensionManager.registerExtension('SmokeDetectorsExtension', MyAwesomeExtension);
 var detectors = [];
 
+    
+
 function MyAwesomeExtension(viewer, options) {
     Autodesk.Viewing.Extension.call(this, viewer, options);
 }
@@ -105,7 +107,7 @@ SimplePanel.prototype.initialize = function () {
         '<tbody>'].join('\n');
 
     for (var i = 0; i < detectors.length; i++) {
-        html += ['<tr><td>' + detectors[i] + '</td><td>test</td><td>test</td><td><button>Show</button></td></tr>'].join('\n');
+        html += ['<tr><td>' + detectors[i] + '</td><td>' + numbers + '</td><td>test</td><td><button>Show</button></td></tr>'].join('\n');
     }
 
     html += ['</tbody>',
